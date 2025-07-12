@@ -1,12 +1,16 @@
 import { COLORS } from "./constants";
 import k from "./kaplayCtx";
+import gameManager from "./gameManager";
 import { formatScore } from "./utils";
 
 // Loads
 k.loadSprite("menu", "./graphics/menu.png");
 k.loadFont("nes-font", "./fonts/nintendo-nes-font/nintendo-nes-font.ttf");
 k.loadSprite("background", "./graphics/background.png");
+k.loadSprite("cursor", "./graphics/cursor.png");
+k.loadSound("gun-shot", "./sounds/gun-shot.wav");
 
+// Main menu scene
 k.scene("main-menu", () => {
   k.add([k.sprite("menu")]);
 
@@ -45,6 +49,7 @@ k.scene("main-menu", () => {
   });
 });
 
+// Game scene
 k.scene("game", () => {
   k.setCursor("none");
   k.add([k.rect(k.width(), k.height()), k.color(COLORS.BLUE), "sky"]);
@@ -77,8 +82,41 @@ k.scene("game", () => {
     k.z(2),
     k.color([0, 0, 0]),
   ]);
+
+  const cursor = k.add([
+    k.sprite("cursor"),
+    k.anchor("center"),
+    k.pos(),
+    k.z(3),
+  ]);
+
+  k.onClick(() => {
+    if (gameManager.state === "hunt-start" && !gameManager.isGamePaused) {
+      if (gameManager.nbBulletsLeft > 0) k.play("gun-shot", { volume: 0.5 });
+      gameManager.nbBulletsLeft--;
+    }
+  });
+
+  k.onUpdate(() => {
+    score.text = formatScore(gameManager.currentScore);
+    switch (gameManager.nbBulletsLeft) {
+      case 1:
+        bulletUIMask.width = 15;
+        break;
+      case 2:
+        bulletUIMask.width = 8;
+        break;
+      case 3:
+        bulletUIMask.width = 0;
+        break;
+      default:
+        bulletUIMask.width = 22;
+    }
+    cursor.moveTo(k.mousePos());
+  });
 });
 
+// Game over scene
 k.scene("game-over", () => {});
 
 k.go("main-menu");
