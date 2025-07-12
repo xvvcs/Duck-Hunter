@@ -1,30 +1,31 @@
-import { COLORS } from "./constants";
+import { COLORS, FONT_CONFIG } from "./constants";
 import k from "./kaplayCtx";
 import gameManager from "./gameManager";
 import { formatScore } from "./utils";
 
 // Loads
-k.loadSprite("menu", "./graphics/menu.png");
 k.loadFont("nes-font", "./fonts/nintendo-nes-font/nintendo-nes-font.ttf");
+
+k.loadSprite("menu", "./graphics/menu.png");
 k.loadSprite("background", "./graphics/background.png");
 k.loadSprite("cursor", "./graphics/cursor.png");
+k.loadSprite("text-box", "./graphics/text-box.png");
+
 k.loadSound("gun-shot", "./sounds/gun-shot.wav");
+k.loadSound("ui-appear", "./sounds/ui-appear.wav");
 
 // Main menu scene
 k.scene("main-menu", () => {
   k.add([k.sprite("menu")]);
 
   k.add([
-    k.text("CLICK TO START", { font: "nes-font", size: 8 }),
+    k.text("CLICK TO START", FONT_CONFIG.NES_FONT),
     k.anchor("center"),
     k.pos(k.center().x, k.center().y + 40),
   ]);
 
   k.add([
-    k.text("MADE BY XVVCS", {
-      font: "nes-font",
-      size: 6,
-    }),
+    k.text("MADE BY XVVCS", FONT_CONFIG.NES_FONT),
     k.color(COLORS.GRAY),
     k.anchor("center"),
     k.pos(k.width() - 200, k.height() - 10),
@@ -34,10 +35,7 @@ k.scene("main-menu", () => {
   let highScore: number = k.getData("high-score") || 0;
 
   k.add([
-    k.text(`TOP SCORE: ${formatScore(highScore)}`, {
-      font: "nes-font",
-      size: 8,
-    }),
+    k.text(`TOP SCORE: ${formatScore(highScore)}`, FONT_CONFIG.NES_FONT),
     k.anchor("center"),
     k.pos(k.center().x, k.center().y + 60),
     k.color(COLORS.RED),
@@ -56,14 +54,14 @@ k.scene("game", () => {
   k.add([k.sprite("background"), k.pos(0, -10), k.z(1)]);
 
   const score = k.add([
-    k.text(formatScore(0), { font: "nes-font", size: 8 }),
+    k.text(formatScore(0), FONT_CONFIG.NES_FONT),
     k.pos(192, 197),
     k.z(2),
     k.color(COLORS.WHITE),
   ]);
 
   const roundCount = k.add([
-    k.text("1", { font: "nes-font", size: 8 }),
+    k.text("1", FONT_CONFIG.NES_FONT),
     k.pos(42, 181),
     k.z(2),
     k.color(COLORS.RED),
@@ -89,6 +87,37 @@ k.scene("game", () => {
     k.pos(),
     k.z(3),
   ]);
+
+  const roundStartController = gameManager.onStateEnter(
+    "round-start",
+    async (isFirstRound: boolean) => {
+      if (!isFirstRound) gameManager.praySpeed += 50;
+      k.play("ui-appear");
+      roundCount.text = String(gameManager.currentRoundNb);
+      const textBox = k.add([
+        k.sprite("text-box"),
+        k.anchor("center"),
+        k.pos(k.center().x, k.center().y - 50),
+        k.z(3),
+      ]);
+      textBox.add([
+        k.text("ROUND", FONT_CONFIG.NES_FONT),
+        k.anchor("center"),
+        k.pos(0, -10),
+      ]);
+      textBox.add([
+        k.text(`${gameManager.currentRoundNb}`, FONT_CONFIG.NES_FONT),
+        k.anchor("center"),
+        k.pos(0, 4),
+      ]);
+
+      await k.wait(2);
+      k.destroy(textBox);
+      gameManager.enterState("hunt-start");
+    }
+  );
+
+  gameManager.enterState("round-start"); // TODO: remove this
 
   k.onClick(() => {
     if (gameManager.state === "hunt-start" && !gameManager.isGamePaused) {

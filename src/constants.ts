@@ -6,3 +6,7 @@ export const COLORS = {
   BLUE: "#add8e6",
   GRAY: "#808080",
 };
+
+export const FONT_CONFIG = {
+  NES_FONT: { font: "nes-font", size: 8 },
+};
