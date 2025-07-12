@@ -10,6 +10,7 @@ const k = kaplay({
   debug: true, // only for dev
   background: [0, 0, 0],
   global: false,
+  
 });
 
 export default k;
