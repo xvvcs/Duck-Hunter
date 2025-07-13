@@ -2,6 +2,7 @@ import { COLORS, FONT_CONFIG } from "./constants";
 import k from "./kaplayCtx";
 import gameManager from "./gameManager";
 import { formatScore } from "./utils";
+import makeDog from "./entities/dog";
 
 // Loads
 k.loadFont("nes-font", "./fonts/nintendo-nes-font/nintendo-nes-font.ttf");
@@ -10,12 +11,32 @@ k.loadSprite("menu", "./graphics/menu.png");
 k.loadSprite("background", "./graphics/background.png");
 k.loadSprite("cursor", "./graphics/cursor.png");
 k.loadSprite("text-box", "./graphics/text-box.png");
+k.loadSprite("dog", "./graphics/dog.png", {
+  sliceX: 4,
+  sliceY: 3,
+  anims: {
+    search: { from: 0, to: 3, speed: 6, loop: true },
+    sniff: { from: 4, to: 5, speed: 4, loop: true },
+    detect: 6,
+    jump: { from: 7, to: 8, speed: 6 },
+    catch: 9,
+    mock: { from: 10, to: 11, loop: true },
+  },
+});
+k.loadSprite("duck", "./graphics/duck.png");
 
 k.loadSound("gun-shot", "./sounds/gun-shot.wav");
 k.loadSound("ui-appear", "./sounds/ui-appear.wav");
+k.loadSound("dog-sniffing", "./sounds/sniffing.wav");
+k.loadSound("dog-barking", "./sounds/barking.wav");
+k.loadSound("dog-laughing", "./sounds/laughing.wav");
+k.loadSound("successful-hunt", "./sounds/successful-hunt.wav");
+k.loadSound("main-menu-music", "./sounds/main-menu-bg.wav");
+k.loadSound("game-music", "./sounds/game-bg.wav");
 
 // Main menu scene
 k.scene("main-menu", () => {
+  const mainMenuMusic = k.play("main-menu-music", { volume: 0.5, loop: true });
   k.add([k.sprite("menu")]);
 
   k.add([
@@ -43,12 +64,16 @@ k.scene("main-menu", () => {
   ]);
 
   k.onClick(() => {
+    mainMenuMusic.stop();
     k.go("game");
   });
 });
 
 // Game scene
 k.scene("game", () => {
+  const gameMusic = k.play("game-music", { volume: 0.3, loop: true });
+  gameMusic.stop();
+
   k.setCursor("none");
   k.add([k.rect(k.width(), k.height()), k.color(COLORS.BLUE), "sky"]);
   k.add([k.sprite("background"), k.pos(0, -10), k.z(1)]);
@@ -88,11 +113,16 @@ k.scene("game", () => {
     k.z(3),
   ]);
 
+  const dog = makeDog(k.vec2(0, k.center().y));
+  dog.searchForDucks();
+
+  // Game state controllers
   const roundStartController = gameManager.onStateEnter(
     "round-start",
     async (isFirstRound: boolean) => {
       if (!isFirstRound) gameManager.praySpeed += 50;
       k.play("ui-appear");
+      gameMusic.play();
       roundCount.text = String(gameManager.currentRoundNb);
       const textBox = k.add([
         k.sprite("text-box"),
@@ -117,11 +147,21 @@ k.scene("game", () => {
     }
   );
 
-  gameManager.enterState("round-start"); // TODO: remove this
+  const roundEndController = gameManager.onStateEnter("round-end", () => {});
+  const huntStartController = gameManager.onStateEnter("hunt-start", () => {});
+  const huntEndController = gameManager.onStateEnter("hunt-end", () => {});
+  const duckHuntedController = gameManager.onStateEnter(
+    "duck-hunted",
+    () => {}
+  );
+  const duckEscapedController = gameManager.onStateEnter(
+    "duck-escaped",
+    () => {}
+  );
 
   k.onClick(() => {
     if (gameManager.state === "hunt-start" && !gameManager.isGamePaused) {
-      if (gameManager.nbBulletsLeft > 0) k.play("gun-shot", { volume: 0.5 });
+      if (gameManager.nbBulletsLeft > 0) k.play("gun-shot", { volume: 0.7 });
       gameManager.nbBulletsLeft--;
     }
   });
@@ -142,6 +182,17 @@ k.scene("game", () => {
         bulletUIMask.width = 22;
     }
     cursor.moveTo(k.mousePos());
+  });
+
+  k.onSceneLeave(() => {
+    roundStartController.cancel();
+    roundEndController.cancel();
+    huntStartController.cancel();
+    huntEndController.cancel();
+    duckHuntedController.cancel();
+    duckEscapedController.cancel();
+    gameManager.resetGameState();
+    gameMusic.stop();
   });
 });
 
