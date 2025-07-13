@@ -75,7 +75,12 @@ k.scene("main-menu", () => {
   let highScore: number = k.getData("high-score") || 0;
 
   k.add([
-    k.text(`TOP SCORE: ${formatScore(highScore)}`, FONT_CONFIG.NES_FONT),
+    k.text(
+      `TOP SCORE: ${
+        String(k.getData("name")).toUpperCase() || "---"
+      } ${formatScore(highScore)}`,
+      FONT_CONFIG.NES_FONT
+    ),
     k.anchor("center"),
     k.pos(k.center().x, k.center().y + 60),
     k.color(COLORS.RED),
@@ -272,6 +277,41 @@ k.scene("game", () => {
 });
 
 // Game over scene
-k.scene("game-over", () => {});
+k.scene("game-over", () => {
+  k.add([k.rect(k.width(), k.height()), k.color(COLORS.BLACK)]);
+  k.add([
+    k.text("GAME OVER!", FONT_CONFIG.NES_FONT),
+    k.anchor("center"),
+    k.pos(k.center()),
+  ]);
+
+  k.wait(2, () => {
+    if (Number(k.getData("high-score")) < gameManager.currentScore)
+      k.go("leaderboard");
+    else k.go("main-menu");
+  });
+});
+
+k.scene("leaderboard", () => {
+  k.add([k.rect(k.width(), k.height()), k.color(COLORS.BLACK)]);
+  k.add([
+    k.text("ENTER YOUR NAME:", FONT_CONFIG.NES_FONT),
+    k.anchor("center"),
+    k.pos(k.center()),
+  ]);
+
+  let name = k.add([
+    k.text("", FONT_CONFIG.NES_FONT),
+    k.anchor("center"),
+    k.pos(k.center().x, k.center().y + 40),
+    k.textInput(true, 3),
+  ]);
+
+  k.onClick(() => {
+    if (Number(k.getData("high-score")) < gameManager.currentScore)
+      k.setData("name", name.text);
+    k.go("main-menu");
+  });
+});
 
 k.go("main-menu");
