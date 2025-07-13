@@ -39,6 +39,8 @@ k.loadSound("quacking", "./sounds/quacking.wav");
 k.loadSound("flapping", "./sounds/flapping.ogg");
 k.loadSound("main-menu-music", "./sounds/main-menu-bg.wav");
 k.loadSound("game-music", "./sounds/game-bg.wav");
+k.loadSound("fall", "./sounds/fall.wav");
+k.loadSound("impact", "./sounds/impact.wav");
 
 // Main menu scene
 k.scene("main-menu", () => {

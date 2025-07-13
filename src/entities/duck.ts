@@ -41,19 +41,57 @@ export default function makeDuck(duckId: string, speed: number) {
         this.flappingSound = k.play("flapping", { speed: 2, loop: true });
 
         this.onStateUpdate("fly", () => {
-          // TODO: implement
+          if (
+            this.flyTimer < this.timeBeforeEscaping &&
+            (this.pos.x < k.width() + 10 || this.pos.x < -10)
+          ) {
+            this.flyDirection.x = -this.flyDirection.x;
+            this.flipX = !this.flipX;
+            const currentAnim =
+              this.getCurAnim().name === "flight-side"
+                ? "flight-diagonal"
+                : "flight-side";
+            this.play(currentAnim);
+          }
+          if (this.pos.y < -10 || this.pos.y > k.height() - 70) {
+            this.flyDirection.y = -this.flyDirection.y;
+            this.flipY = !this.flipY;
+            const currentAnim =
+              this.getCurAnim().name === "flight-side"
+                ? "flight-diagonal"
+                : "flight-side";
+            this.play(currentAnim);
+          }
+          this.move(k.vec2(this.flyDirection)).scale(this.speed);
         });
 
-        this.onStateEnter("shot", () => {
-          // TODO: implement
+        this.onStateEnter("shot", async () => {
+          gameManager.nbDucksShotInRound++;
+          this.quackingSound.stop();
+          this.flappingSound.stop();
+          await k.wait(0.2);
+          this.enterState("fall");
         });
 
         this.onStateEnter("fall", () => {
-          // TODO: implement
+          this.fallSound = k.play("fall", { volume: 0.7 });
+          this.play("fall");
         });
 
         this.onStateUpdate("fall", async () => {
-          // TODO: implement
+          this.move(0, this.speed);
+          if (this.pos.y > k.height() - 70) {
+            this.fallSound.stop();
+            k.play("impact");
+            k.destroy(this);
+            sky.color = k.Color.fromHex(COLORS.BLUE);
+            const duckIcon = k.get(`duckIcon${this.duckId}`, {
+              recursive: true,
+            })[0];
+            if (duckIcon) duckIcon.color = k.Color.fromHex(COLORS.RED);
+            await k.wait(1);
+            gameManager.enterState("duck-hunted");
+          }
         });
 
         this.onClick(() => {
