@@ -1,4 +1,4 @@
-# Duck Hunt 🎯🦆
+# Duck Hunter 🎯🦆
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen?style=flat-square)](https://github.com/your/repo/actions)
 [![License: CC BY-NC-SA 3.0](https://img.shields.io/badge/license-CC--BY--NC--SA%203.0-lightgrey?style=flat-square)](http://creativecommons.org/licenses/by-nc-sa/3.0/)
