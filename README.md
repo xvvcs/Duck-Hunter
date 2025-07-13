@@ -66,6 +66,7 @@ A retro-inspired browser game that pays homage to the classic Duck Hunt! Shoot d
   - Successful Hunt: [freesound.org/s/320655/](https://freesound.org/s/320655/) — Attribution 3.0
   - Forest Ambiance: [dobroide](https://freesound.org/s/421955/) — Attribution 4.0
 - **Sprites:** Custom/edited for this project (see `public/graphics/`)
+- **ALL RIGHTS TO NINTENDO**
 
 ## 📜 License
 This project is for educational and non-commercial use. See individual asset licenses above. NES font is [CC BY-NC-SA 3.0](http://creativecommons.org/licenses/by-nc-sa/3.0/).
