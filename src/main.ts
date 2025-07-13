@@ -3,6 +3,7 @@ import k from "./kaplayCtx";
 import gameManager from "./gameManager";
 import { formatScore } from "./utils";
 import makeDog from "./entities/dog";
+import makeDuck from "./entities/duck";
 
 // Loads
 
@@ -26,7 +27,16 @@ k.loadSprite("dog", "./graphics/dog.png", {
     mock: { from: 10, to: 11, loop: true },
   },
 });
-k.loadSprite("duck", "./graphics/duck.png");
+k.loadSprite("duck", "./graphics/duck.png", {
+  sliceX: 8,
+  sliceY: 1,
+  anims: {
+    "flight-diagonal": { from: 0, to: 2, loop: true },
+    "flight-side": { from: 3, to: 5, loop: true },
+    shot: 6,
+    fall: 7,
+  },
+});
 
 // Sounds
 k.loadSound("gun-shot", "./sounds/gun-shot.wav");
@@ -128,6 +138,7 @@ k.scene("game", () => {
   const roundStartController = gameManager.onStateEnter(
     "round-start",
     async (isFirstRound: boolean) => {
+      gameManager.currentRoundNb++;
       if (!isFirstRound) gameManager.praySpeed += 50;
       k.play("ui-appear");
       gameMusic.play();
@@ -156,7 +167,14 @@ k.scene("game", () => {
   );
 
   const roundEndController = gameManager.onStateEnter("round-end", () => {});
-  const huntStartController = gameManager.onStateEnter("hunt-start", () => {});
+  const huntStartController = gameManager.onStateEnter("hunt-start", () => {
+    gameManager.currentHuntNb++;
+    const duck = makeDuck(
+      String(gameManager.currentHuntNb - 1),
+      gameManager.praySpeed
+    );
+    duck.setBehavior();
+  });
   const huntEndController = gameManager.onStateEnter("hunt-end", () => {});
   const duckHuntedController = gameManager.onStateEnter(
     "duck-hunted",

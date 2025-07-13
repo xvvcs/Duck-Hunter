@@ -16,7 +16,7 @@ export default function makeDuck(duckId: string, speed: number) {
   const chosenFlyDirectionIndex = k.randi(flyDirection.length);
 
   return k.add([
-    k.sprite("duck", { anim: "flight-style" }),
+    k.sprite("duck", { anim: "flight-side" }),
     k.area({ shape: new k.Rect(k.vec2(0), 24, 24) }),
     k.body(),
     k.anchor("center"),
@@ -43,7 +43,7 @@ export default function makeDuck(duckId: string, speed: number) {
         this.onStateUpdate("fly", () => {
           if (
             this.flyTimer < this.timeBeforeEscaping &&
-            (this.pos.x < k.width() + 10 || this.pos.x < -10)
+            (this.pos.x > k.width() + 10 || this.pos.x < -10)
           ) {
             this.flyDirection.x = -this.flyDirection.x;
             this.flipX = !this.flipX;
@@ -55,14 +55,13 @@ export default function makeDuck(duckId: string, speed: number) {
           }
           if (this.pos.y < -10 || this.pos.y > k.height() - 70) {
             this.flyDirection.y = -this.flyDirection.y;
-            this.flipY = !this.flipY;
             const currentAnim =
               this.getCurAnim().name === "flight-side"
                 ? "flight-diagonal"
                 : "flight-side";
             this.play(currentAnim);
           }
-          this.move(k.vec2(this.flyDirection)).scale(this.speed);
+          this.move(k.vec2(this.flyDirection).scale(this.speed));
         });
 
         this.onStateEnter("shot", async () => {
