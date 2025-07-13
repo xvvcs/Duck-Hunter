@@ -51,6 +51,7 @@ k.loadSound("main-menu-music", "./sounds/main-menu-bg.wav");
 k.loadSound("game-music", "./sounds/game-bg.wav");
 k.loadSound("fall", "./sounds/fall.wav");
 k.loadSound("impact", "./sounds/impact.wav");
+k.loadSound("bonus-score", "./sounds/bonus.wav");
 
 // Main menu scene
 k.scene("main-menu", () => {
@@ -166,7 +167,42 @@ k.scene("game", () => {
     }
   );
 
-  const roundEndController = gameManager.onStateEnter("round-end", () => {});
+  const roundEndController = gameManager.onStateEnter("round-end", async () => {
+    if (gameManager.nbDucksShotInRound < 6) {
+      k.go("game-over");
+      return;
+    }
+
+    if (gameManager.nbDucksShotInRound === 10) {
+      const textBox = k.add([
+        k.sprite("text-box"),
+        k.anchor("center"),
+        k.pos(k.center().x, k.center().y - 50),
+        k.z(3),
+      ]);
+      textBox.add([
+        k.text("BONUS!", FONT_CONFIG.NES_FONT),
+        k.anchor("center"),
+        k.pos(0, -10),
+      ]);
+      textBox.add([
+        k.text(`+500`, FONT_CONFIG.NES_FONT),
+        k.anchor("center"),
+        k.pos(0, 4),
+      ]);
+      k.play("bonus-score", { volume: 2 });
+      gameManager.currentScore += 500;
+      await k.wait(2);
+      k.destroy(textBox);
+    }
+
+    gameManager.nbDucksShotInRound = 0;
+    for (const duckIcon of duckIcons.children) {
+      duckIcon.color = k.Color.fromHex(COLORS.WHITE);
+    }
+    await k.wait(2);
+    gameManager.enterState("round-start");
+  });
   const huntStartController = gameManager.onStateEnter("hunt-start", () => {
     gameManager.currentHuntNb++;
     const duck = makeDuck(
