@@ -5,8 +5,11 @@ import { formatScore } from "./utils";
 import makeDog from "./entities/dog";
 
 // Loads
+
+// Fonts
 k.loadFont("nes-font", "./fonts/nintendo-nes-font/nintendo-nes-font.ttf");
 
+// Sprites
 k.loadSprite("menu", "./graphics/menu.png");
 k.loadSprite("background", "./graphics/background.png");
 k.loadSprite("cursor", "./graphics/cursor.png");
@@ -25,12 +28,15 @@ k.loadSprite("dog", "./graphics/dog.png", {
 });
 k.loadSprite("duck", "./graphics/duck.png");
 
+// Sounds
 k.loadSound("gun-shot", "./sounds/gun-shot.wav");
 k.loadSound("ui-appear", "./sounds/ui-appear.wav");
 k.loadSound("dog-sniffing", "./sounds/sniffing.wav");
 k.loadSound("dog-barking", "./sounds/barking.wav");
 k.loadSound("dog-laughing", "./sounds/laughing.wav");
 k.loadSound("successful-hunt", "./sounds/successful-hunt.wav");
+k.loadSound("quacking", "./sounds/quacking.wav");
+k.loadSound("flapping", "./sounds/flapping.ogg");
 k.loadSound("main-menu-music", "./sounds/main-menu-bg.wav");
 k.loadSound("game-music", "./sounds/game-bg.wav");
 

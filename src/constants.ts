@@ -5,6 +5,7 @@ export const COLORS = {
   GREEN: "#00FF00",
   BLUE: "#add8e6",
   GRAY: "#808080",
+  BEIGE: "#f5f5dc",
 };
 
 export const FONT_CONFIG = {
