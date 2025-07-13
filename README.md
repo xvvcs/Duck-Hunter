@@ -8,6 +8,7 @@
 ---
 
 A retro-inspired browser game that pays homage to the classic Duck Hunt! Shoot ducks, beat your high score, and enjoy pixel-perfect nostalgia with modern web tech.
+<br>**Available right now under:** https://duck-hunter-six.vercel.app/
 
 ---
 
