@@ -175,15 +175,28 @@ k.scene("game", () => {
     );
     duck.setBehavior();
   });
-  const huntEndController = gameManager.onStateEnter("hunt-end", () => {});
-  const duckHuntedController = gameManager.onStateEnter(
-    "duck-hunted",
-    () => {}
-  );
-  const duckEscapedController = gameManager.onStateEnter(
-    "duck-escaped",
-    () => {}
-  );
+  const huntEndController = gameManager.onStateEnter("hunt-end", () => {
+    const bestScore = Number(k.getData("high-score"));
+    if (gameManager.currentScore > bestScore) {
+      k.setData("high-score", String(gameManager.currentScore));
+    }
+
+    if (gameManager.currentHuntNb <= 9) {
+      gameManager.enterState("hunt-start");
+      return;
+    }
+
+    gameManager.currentHuntNb = 0;
+    gameManager.enterState("round-end");
+  });
+
+  const duckHuntedController = gameManager.onStateEnter("duck-hunted", () => {
+    gameManager.nbBulletsLeft = 3;
+    dog.catchFallenDuck();
+  });
+  const duckEscapedController = gameManager.onStateEnter("duck-escaped", () => {
+    dog.mockPlayer();
+  });
 
   k.onClick(() => {
     if (gameManager.state === "hunt-start" && !gameManager.isGamePaused) {

@@ -66,6 +66,7 @@ export default function makeDuck(duckId: string, speed: number) {
 
         this.onStateEnter("shot", async () => {
           gameManager.nbDucksShotInRound++;
+          this.play("shot");
           this.quackingSound.stop();
           this.flappingSound.stop();
           await k.wait(0.2);
@@ -84,10 +85,11 @@ export default function makeDuck(duckId: string, speed: number) {
             k.play("impact");
             k.destroy(this);
             sky.color = k.Color.fromHex(COLORS.BLUE);
-            const duckIcon = k.get(`duckIcon${this.duckId}`, {
+            const duckIcon = k.get(`duck-icon-${this.duckId}`, {
               recursive: true,
             })[0];
             if (duckIcon) duckIcon.color = k.Color.fromHex(COLORS.RED);
+
             await k.wait(1);
             gameManager.enterState("duck-hunted");
           }
